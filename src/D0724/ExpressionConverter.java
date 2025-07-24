@@ -348,13 +348,13 @@ public class ExpressionConverter extends JFrame {
         for (int i = 0; i < infix.length(); i++) {
             char ch = infix.charAt(i);
 
-            // 跳過空格
-            if (ch == ' ') {
-                continue;
-            }
+            if (ch == ' ') continue;
 
             // 如果是運算元
             if (isOperand(ch)) {
+                if (lastWasOperand && result.length() > 0) {
+                    result.append(' ');
+                }
                 result.append(ch);
                 lastWasOperand = true;
             }
@@ -370,15 +370,10 @@ public class ExpressionConverter extends JFrame {
                 }
                 while (!stack.isEmpty() && stack.peek() != '(') {
                     char op = stack.pop();
-                    if (op == '~') {
-                        result.append('-'); // 將 ~ 轉回 -
-                    } else {
-                        result.append(op);
-                    }
-                    result.append(' ');
+                    result.append(op == '~' ? '-' : op).append(' ');
                 }
                 if (!stack.isEmpty()) {
-                    stack.pop(); // 移除左括號
+                    stack.pop();
                 }
                 lastWasOperand = false;
             }
@@ -387,54 +382,29 @@ public class ExpressionConverter extends JFrame {
                 if (lastWasOperand) {
                     result.append(' ');
                 }
-                // 對於前序轉換，調整結合性
-                if (ch == '~') {
-                    // 一元負號處理
-                    while (!stack.isEmpty() && stack.peek() != '(' &&
-                            getPrecedence(stack.peek()) > getPrecedence(ch)) {
-                        char op = stack.pop();
-                        if (op == '~') {
-                            result.append('-');
-                        } else {
-                            result.append(op);
-                        }
-                        result.append(' ');
-                    }
-                } else {
-                    while (!stack.isEmpty() && stack.peek() != '(' &&
-                            getPrecedence(stack.peek()) > getPrecedence(ch)) {
-                        char op = stack.pop();
-                        if (op == '~') {
-                            result.append('-');
-                        } else {
-                            result.append(op);
-                        }
-                        result.append(' ');
-                    }
+
+                while (!stack.isEmpty() && stack.peek() != '(' &&
+                      getPrecedence(stack.peek()) >= getPrecedence(ch)) {
+                    char op = stack.pop();
+                    result.append(op == '~' ? '-' : op).append(' ');
                 }
                 stack.push(ch);
                 lastWasOperand = false;
             }
         }
 
-        // 如果最後是運算元，加空格
-        if (lastWasOperand && !stack.isEmpty()) {
+        if (lastWasOperand) {
             result.append(' ');
         }
 
         // 彈出剩餘的運算子
         while (!stack.isEmpty()) {
-            if (result.length() > 0 && result.charAt(result.length() - 1) != ' ') {
-                result.append(' ');
-            }
             char op = stack.pop();
-            if (op == '~') {
-                result.append('-'); // 將 ~ 轉回 -
-            } else {
-                result.append(op);
-            }
-            if (!stack.isEmpty()) {
-                result.append(' ');
+            if (op != '(') {
+                result.append(op == '~' ? '-' : op);
+                if (!stack.isEmpty()) {
+                    result.append(' ');
+                }
             }
         }
 
@@ -510,3 +480,4 @@ public class ExpressionConverter extends JFrame {
         });
     }
 }
+
