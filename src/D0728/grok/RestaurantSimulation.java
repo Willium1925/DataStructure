@@ -122,20 +122,20 @@ public class RestaurantSimulation extends JFrame {
             try {
                 // 隨機延遲2-5秒生成新訂單
                 Thread.sleep(rand.nextInt(3000) + 2000);
-
+                
                 // 隨機選擇一張桌子
                 Table table = tables.get(rand.nextInt(NUM_TABLES));
                 if (!table.isOccupied()) {
                     // 如果桌子空閒，創建新訂單
                     table.setOccupied(true);
                     Order order = new Order(table.id);
-
+                    
                     // 隨機生成1-3個餐點
                     int numItems = rand.nextInt(3) + 1;
                     for (int j = 0; j < numItems; j++) {
                         order.addItem(menu[rand.nextInt(menu.length)]);
                     }
-
+                    
                     // 將訂單分配給桌子並加入處理佇列
                     table.order = order;
                     orderQueue.offer(order);
@@ -186,7 +186,7 @@ public class RestaurantSimulation extends JFrame {
     /**
      * 送餐員執行緒的主要邏輯
      * 每個送餐員都是一個獨立的執行緒，負責尋找並送達準備好的餐點
-     *
+     * 
      * @param staffId 送餐員編號
      */
     private void deliverOrders(int staffId) {
@@ -275,7 +275,7 @@ public class RestaurantSimulation extends JFrame {
     /**
      * 送餐員移動動畫的實現方法
      * 將送餐員從當前位置平滑移動到目標位置
-     *
+     * 
      * @param staff 要移動的送餐員
      * @param targetX 目標X座標
      * @param targetY 目標Y座標
@@ -287,7 +287,7 @@ public class RestaurantSimulation extends JFrame {
         // 計算每步移動的距離
         int dx = (targetX - startX) / steps;
         int dy = (targetY - startY) / steps;
-
+        
         // 分步移動送餐員
         for (int i = 0; i <= steps; i++) {
             staff.x = startX + dx * i;
