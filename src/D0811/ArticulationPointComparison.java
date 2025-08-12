@@ -12,10 +12,10 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 public class ArticulationPointComparison extends JFrame {
-    private static final int MIN_VERTICES = 1;
-    private static final int MAX_VERTICES = 20;
-    private static final int VERTEX_STEP = 1;
-    private static final int EDGE_STEP_FACTOR = 1;
+    private static final int MIN_VERTICES = 1; // 最小頂點數
+    private static final int MAX_VERTICES = 20; // 最大頂點數
+    private static final int VERTEX_STEP = 1; // 頂點數增量
+    private static final int EDGE_STEP_FACTOR = 1; // 邊數增量因子
     private static final int RUNS_PER_TEST = 5; // 平均多次運行以減少隨機誤差
 
     public ArticulationPointComparison() {
@@ -41,17 +41,17 @@ public class ArticulationPointComparison extends JFrame {
             int maxEdges = (vertices * (vertices - 1)) / 2;
             for (int edges = vertices; edges <= maxEdges; edges += vertices * EDGE_STEP_FACTOR) {
                 long simpleTime = 0;
-                long tarjanTime = 0;
+                long fastTime = 0;
 
                 // 多次運行取平均值
                 for (int run = 0; run < RUNS_PER_TEST; run++) {
                     List<List<Integer>> graph = generateRandomConnectedGraph(vertices, edges);
                     simpleTime += measureSimpleMethod(graph);
-                    tarjanTime += measureTarjanMethod(graph);
+                    fastTime += measureTarjanMethod(graph);
                 }
 
                 double simpleAvgTime = simpleTime / (double) RUNS_PER_TEST / 1_000_000.0; // 轉為毫秒
-                double tarjanAvgTime = tarjanTime / (double) RUNS_PER_TEST / 1_000_000.0;
+                double tarjanAvgTime = fastTime / (double) RUNS_PER_TEST / 1_000_000.0;
 
                 simpleSeries.add(edges, simpleAvgTime);
                 tarjanSeries.add(edges, tarjanAvgTime);
