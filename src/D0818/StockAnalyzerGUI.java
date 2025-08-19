@@ -38,10 +38,6 @@ public class StockAnalyzerGUI extends JFrame {
     // 儲存股票資料的資料結構
     private List<StockRecord> stockData;
 
-    // 新增成員變數：最早/最新日期
-    private LocalDate minDate;
-    private LocalDate maxDate;
-
     /**
      * 股票記錄類別
      */
@@ -104,14 +100,8 @@ public class StockAnalyzerGUI extends JFrame {
         GridBagConstraints gbc = new GridBagConstraints();
         panel.setBorder(BorderFactory.createTitledBorder("查詢條件"));
 
-        // 資料期間顯示
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
-        JLabel dateRangeLabel = new JLabel("資料期間：" + (minDate != null ? minDate.toString() : "?") + " ~ " + (maxDate != null ? maxDate.toString() : "?"));
-        panel.add(dateRangeLabel, gbc);
-        gbc.gridwidth = 1;
-
         // 股票代碼輸入
-        gbc.gridx = 0; gbc.gridy = 1;
+        gbc.gridx = 0; gbc.gridy = 0;
         panel.add(new JLabel("股票代碼:"), gbc);
         gbc.gridx = 1;
         stockCodeField = new JTextField(10);
@@ -119,7 +109,7 @@ public class StockAnalyzerGUI extends JFrame {
         panel.add(stockCodeField, gbc);
 
         // 日期查詢類型選擇
-        gbc.gridx = 0; gbc.gridy = 2;
+        gbc.gridx = 0; gbc.gridy = 1;
         panel.add(new JLabel("日期查詢:"), gbc);
         gbc.gridx = 1;
         JPanel dateTypePanel = new JPanel();
@@ -133,7 +123,7 @@ public class StockAnalyzerGUI extends JFrame {
         panel.add(dateTypePanel, gbc);
 
         // 開始日期
-        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.gridx = 0; gbc.gridy = 2;
         panel.add(new JLabel("開始日期:"), gbc);
         gbc.gridx = 1;
         startDateField = new JTextField(10);
@@ -141,7 +131,7 @@ public class StockAnalyzerGUI extends JFrame {
         panel.add(startDateField, gbc);
 
         // 結束日期
-        gbc.gridx = 0; gbc.gridy = 4;
+        gbc.gridx = 0; gbc.gridy = 3;
         panel.add(new JLabel("結束日期:"), gbc);
         gbc.gridx = 1;
         endDateField = new JTextField(10);
@@ -149,7 +139,7 @@ public class StockAnalyzerGUI extends JFrame {
         panel.add(endDateField, gbc);
 
         // 排序方式選擇
-        gbc.gridx = 0; gbc.gridy = 5;
+        gbc.gridx = 0; gbc.gridy = 4;
         panel.add(new JLabel("排序依據:"), gbc);
         gbc.gridx = 1;
         JPanel sortPanel = new JPanel();
@@ -163,7 +153,7 @@ public class StockAnalyzerGUI extends JFrame {
         panel.add(sortPanel, gbc);
 
         // 顯示前N名
-        gbc.gridx = 0; gbc.gridy = 6;
+        gbc.gridx = 0; gbc.gridy = 5;
         panel.add(new JLabel("顯示前N名:"), gbc);
         gbc.gridx = 1;
         topNField = new JTextField("10", 10);
@@ -203,10 +193,10 @@ public class StockAnalyzerGUI extends JFrame {
      */
     private void loadStockData() {
         stockData = new ArrayList<>();
-        minDate = null;
-        maxDate = null;
+
         try (BufferedReader reader = new BufferedReader(new FileReader("stock_data.csv"))) {
             String line = reader.readLine(); // 跳過標題行
+
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
                 if (parts.length >= 4) {
@@ -214,14 +204,13 @@ public class StockAnalyzerGUI extends JFrame {
                     LocalDate date = LocalDate.parse(parts[1].trim(), DATE_FORMAT);
                     long volume = Long.parseLong(parts[2].trim());
                     long amount = Long.parseLong(parts[3].trim());
+
                     stockData.add(new StockRecord(stockCode, date, volume, amount));
-                    // 統計最早/最新日期
-                    if (minDate == null || date.isBefore(minDate)) minDate = date;
-                    if (maxDate == null || date.isAfter(maxDate)) maxDate = date;
                 }
             }
+
             System.out.println("載入完成，共 " + stockData.size() + " 筆資料");
-            System.out.println("資料期間：" + minDate + " ~ " + maxDate);
+
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this,
                     "無法載入資料檔案: " + e.getMessage(),
